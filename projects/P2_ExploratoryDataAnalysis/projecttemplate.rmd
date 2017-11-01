@@ -12,20 +12,20 @@ in small rivers in Flanders. The dataset has 4211 rows of 15 variables:
 
 * nitrate: Yearly maximum nitrate concentration in the river [mg N/L]
 * year: Year of measurement
-* rainfall: Cumulative rainfall in the month leading up to the measurement
-* oxygen: Oxygen saturation
-* area: area of farmland divided by total upstream area. 0 --> no farming,
-1 --> all farmland
-* emission: emmission of N by animals divided by area of farmland
-* stockage: stockage of manure in a year
+* rainfall: Cumulative rainfall in the month leading up to the measurement [mm]
+* oxygen: Oxygen saturation [%]
+* area: area of farmland divided by total upstream area [%]. 0 --> no farming,
+1 --> all farmland 
+* emission: emmission of N by animals divided by area of farmland [kg / m²]
+* stockage: stockage of manure in a year [kg / m²]
 * grass: area of grass divided by area of farmland
-* vegetableG1: area of vegetables in group G1 divided by area of farmland
-* vegetableG2: area of vegetables in group G2 divided by area of farmland
-* vegetableG3: area of vegetables in group G3 divided by area of farmland
+* vegetableG1: area of vegetables in group G1 divided by area of farmland [%]
+* vegetableG2: area of vegetables in group G2 divided by area of farmland [%]
+* vegetableG3: area of vegetables in group G3 divided by area of farmland [%]
 * catchcrop: Factor indicating whether yes or no a catchcrop is planted.
 (https://en.wikipedia.org/wiki/Catch_crop)
-* norm_N: threshold of N to be applied on the field
-* depostion: depostion of N from the air in the total upstream area.
+* norm_N: threshold of N to be applied on the field [kg/m²]
+* depostion: depostion of N from the air in the total upstream area [kg/m²]
 
 What we are mainly interested here is to see if any of these variables can
 explain the variance in the nitrate concentrations in the river.

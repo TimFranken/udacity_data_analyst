@@ -128,18 +128,18 @@ $(document).ready(function () {
 <ul>
 <li>nitrate: Yearly maximum nitrate concentration in the river [mg N/L]</li>
 <li>year: Year of measurement</li>
-<li>rainfall: Cumulative rainfall in the month leading up to the measurement</li>
-<li>oxygen: Oxygen saturation</li>
-<li>area: area of farmland divided by total upstream area. 0 –&gt; no farming, 1 –&gt; all farmland</li>
-<li>emission: emmission of N by animals divided by area of farmland</li>
-<li>stockage: stockage of manure in a year</li>
+<li>rainfall: Cumulative rainfall in the month leading up to the measurement [mm]</li>
+<li>oxygen: Oxygen saturation [%]</li>
+<li>area: area of farmland divided by total upstream area [%]. 0 –&gt; no farming, 1 –&gt; all farmland</li>
+<li>emission: emmission of N by animals divided by area of farmland [kg / m²]</li>
+<li>stockage: stockage of manure in a year [kg / m²]</li>
 <li>grass: area of grass divided by area of farmland</li>
-<li>vegetableG1: area of vegetables in group G1 divided by area of farmland</li>
-<li>vegetableG2: area of vegetables in group G2 divided by area of farmland</li>
-<li>vegetableG3: area of vegetables in group G3 divided by area of farmland</li>
+<li>vegetableG1: area of vegetables in group G1 divided by area of farmland [%]</li>
+<li>vegetableG2: area of vegetables in group G2 divided by area of farmland [%]</li>
+<li>vegetableG3: area of vegetables in group G3 divided by area of farmland [%]</li>
 <li>catchcrop: Factor indicating whether yes or no a catchcrop is planted. (<a href="https://en.wikipedia.org/wiki/Catch_crop" class="uri">https://en.wikipedia.org/wiki/Catch_crop</a>)</li>
-<li>norm_N: threshold of N to be applied on the field</li>
-<li>depostion: depostion of N from the air in the total upstream area.</li>
+<li>norm_N: threshold of N to be applied on the field [kg/m²]</li>
+<li>depostion: depostion of N from the air in the total upstream area [kg/m²]</li>
 </ul>
 <p>What we are mainly interested here is to see if any of these variables can explain the variance in the nitrate concentrations in the river.</p>
 <pre><code>## 'data.frame':    4211 obs. of  15 variables:
