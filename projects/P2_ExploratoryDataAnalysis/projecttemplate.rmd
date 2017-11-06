@@ -30,6 +30,9 @@ in small rivers in Flanders. The dataset has 4211 rows of 15 variables:
 What we are mainly interested here is to see if any of these variables can
 explain the variance in the nitrate concentrations in the river.
 
+First, let's take a look at the general structure of the data and some
+summaries.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that you end up using in your analysis in this code
 # chunk.
@@ -60,7 +63,7 @@ river. By law there is a threhsold of 11.3 mg N/L.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 qplot(x = nitrate, data=nc, binwidth=1) + 
-  geom_segment(aes(x =11, y = 0, xend = 11, yend = 400),  linetype="dashed",
+  geom_segment(aes(x =11, y = 0, xend = 11, yend = 500),  linetype="dashed",
                color="red")
 
 sum(nc$nitrate>11.3) / nrow(nc)
@@ -68,14 +71,9 @@ sum(nc$nitrate>11.3) / nrow(nc)
 ```
 
 As we can see there is a significant number of measurements (25%) which exeed 
-the given threshold.
+the given threshold which is depicted by the dashed red line.
 
 We also want to take a look at the other variables.
-
-Oxygen has a lot of 0 measurements. These are measurements that are below the
-detection limit. This is important to remember once we start building our model.
-We still have 2620 measuremnts or about 62% of the total if we would eliminate
-those with 0 measurements.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 qplot(x=oxygen, data=nc, bins=50)
@@ -86,9 +84,15 @@ sum(nc$oxygen>0)
 sum(nc$oxygen>0) / nrow(nc)
 ```
 
+Oxygen has a lot of 0 measurements. The plots above show the histogram with and
+without the 0 measurements.
+These are measurements that are below the detection limit. This is important to
+remember once we start building our model.
+
+We still have 2620 measuremnts or about 62% of the total if we would eliminate
+those with 0 measurements.
+
 The histograms of the other univariate quantitative variables are given below.
-Based on these histograms we see that depostition contains a couple of outliers.
-These are removed from the dataset for further analysis.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
@@ -110,8 +114,16 @@ nc <- nc %>% filter(deposition < quantile(deposition, 0.99))
 
 ```
 
+Based on these histograms we see that depostition contains a couple of outliers.
+These are removed from the dataset for further analysis. Apart from this, the
+histograms do not indicate clear outliers. It is also clear that not all data
+is normally distributed.
+
 Vegetables are divided in 3 different groups containing different types of
 vegetables. For this exercise we lump them together in 1 group of vegetables. 
+First we check the percentage of data for each group and the total group. That
+implies that the value is higher than 0.
+
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
@@ -126,14 +138,18 @@ nc$total_veg = nc$vegetableG1 + nc$vegetableG2 + nc$vegetableG3
 # Get percentage of datapoints with values higher than 0 for all groups
 sum(nc$total_veg >0) / nrow(nc)
 
+```
+
+Finally, let's take a look at the resulting histogram, both with and without
+the 0 values.
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE}
+#Histogram of the new variable, total vegetable.
 qplot(x=total_veg, data=nc)
 
 # Histogram without the 0 values.
 qplot(x=total_veg, data=subset(nc, total_veg >0))
-
 ```
-
-
 
 
 # Univariate Analysis
@@ -168,7 +184,8 @@ oxygen variable that might influence further analysis.
 # Bivariate Plots Section
 
 
-First we want to investigate the trend in nitrate conccentrations in time.
+First we want to investigate the trend in nitrate conccentrations in time. We 
+plot different figures which all show similar information.
 
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
@@ -183,20 +200,6 @@ qplot(x = nitrate, data=nc, bins=30) +
 qplot(x=nitrate, data=nc,
       geom='freqpoly',
       color=year)
-
-# Create an overview plot of all measurements with some summaries.
-ggplot(aes(x=year, y=nitrate, group=1), data=nc) + 
-  geom_point(alpha=1/30) + 
-  geom_point(stat="summary", fun.y = median, color="red") +
-  geom_line(stat="summary", fun.y= median, color="red") +
-  geom_point(stat="summary", fun.y= quantile, fun.args=list(probs=0.95),
-             color="blue") +
-  geom_line(stat="summary", fun.y= quantile, fun.args=list(probs=0.95),
-            color="blue") + 
-  geom_point(stat="summary", fun.y= quantile, fun.args=list(probs=0.05),
-             color="blue") +
-  geom_line(stat="summary", fun.y= quantile, fun.args=list(probs=0.05),
-            color="blue")
 
 # This overview is actually better with just a boxplot.
 qplot(x=year, y=nitrate, data=nc, geom = 'boxplot')
@@ -218,8 +221,36 @@ ggplot(aes(x=year, y=nr_of_exc, group=1), data=nc.year) +
 ```
 
 All of the plots show a similar pattern. Since 2010 median nitrate
-concentrations have been decreasing. Also the number of exceedances (nitrate
-concentrations > 11.3 mg N/L) has been decreasing in the last years.
+concentrations have been decreasing. This can be derived from the histograms, 
+the frequency polygons as well as the summary values.
+Also the number of exceedances (nitrate concentrations > 11.3 mg N/L) has been
+decreasing in the last years as can be seen in the last plot.
+
+In order to get a better view on the trend in time we create a summary plot.
+
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE}
+
+# Create an overview plot of all measurements with some summaries.
+# This is similar than the boxplot but connecting lines give a better view.
+ggplot(aes(x=year, y=nitrate, group=1), data=nc) + 
+  geom_point(alpha=1/30) + 
+  geom_point(stat="summary", fun.y = median, color="red") +
+  geom_line(stat="summary", fun.y= median, color="red") +
+  geom_point(stat="summary", fun.y= quantile, fun.args=list(probs=0.95),
+             color="blue") +
+  geom_line(stat="summary", fun.y= quantile, fun.args=list(probs=0.95),
+            color="blue") + 
+  geom_point(stat="summary", fun.y= quantile, fun.args=list(probs=0.05),
+             color="blue") +
+  geom_line(stat="summary", fun.y= quantile, fun.args=list(probs=0.05),
+            color="blue")
+```
+
+
+The red line in this plot shows the median concentration for each year. The
+blue lines show the 0.05 & 0.95 quantiles. Although this plot shows similar 
+information as the box plot, the decreasing trend is better visualised.
 
 Second question we have is whether or not the use of a catch crop decreases the
 observed concentrations in the river
@@ -232,7 +263,7 @@ nc.catch <- nc %>% group_by(catchcrop) %>%
             low_quant = quantile(nitrate, 0.05),
             high_quant = quantile(nitrate, 0.95))
 
-summary(nc.catch)
+head(nc.catch)
 
 # Summarize information in freqpoly and boxplot
 qplot(x=nitrate, data=nc,
@@ -243,9 +274,12 @@ qplot(x=catchcrop, y=nitrate, data=nc, geom = 'boxplot')
 
 ```
 
-The resulting plots and tables do show an effect of the catch crop.
+Both resulting plots and the table do show an effect of the catch crop. Median 
+nitrate concentrations are lower if a catch crop is used.
 
 Let's investigate the correlations between some other quantitative variables. 
+First we draw a scatter matrix to give a first idea of which variables are
+worth investigating further.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
@@ -267,6 +301,8 @@ ggplot(aes(x=oxygen, y=nitrate), data=subset(nc, oxygen>0)) +
 
 ```
 
+The plot does show some correlation although it is not very clear.
+
 As well as area.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
@@ -282,6 +318,9 @@ qplot(x=nitrate.bucket, y=area, data=nc, geom = 'boxplot')
 ```
 
 From these plots it is clear that there is a correlation between both.
+As the first plot was still prone to overplotting I subdived the nitrate in 
+different buckets and plotted boxplots for each of them. This gives a clearer
+image of the situation.
 Higher nitrate concentrations have in general higher areas. As a reminder, area
 indicates the proporation of farmland in the upstream area.
 
@@ -295,24 +334,24 @@ expect that farm activities have an influence on the depostion.
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
 ggplot(aes(x=deposition, y=area), data=nc) + 
-  geom_point()
+  geom_point(alpha=1/5)
 
 ```
 
 Also the variables emission, grass & total_veg have a small but existing
-correlation
+correlation.
 
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
 ggplot(aes(x=emission, y=nitrate), data=nc) + 
-  geom_point() + 
+  geom_point(alpha=1/5) + 
   xlim(0,0.02)
 
 ggplot(aes(x=grass, y=nitrate), data=nc) + 
-  geom_point()
+  geom_point(alpha=1/5)
 
 ggplot(aes(x=total_veg, y=nitrate), data=subset(nc, total_veg>0)) + 
-  geom_point()
+  geom_point(alpha=1/5)
 
 ```
 
@@ -330,7 +369,8 @@ with(subset(nc, total_veg>0), cor.test(nitrate, total_veg))
 
 ```
 
-
+This analysis indicates that it is important to take note of the 0 values in
+the subsequent analysis.
 
 # Bivariate Analysis
 
@@ -364,8 +404,8 @@ plot.
 ```{r echo=FALSE,  message=FALSE, warning=FALSE}
 
 ggplot(aes(x=area, y=deposition, color=nitrate), data=nc) + 
-  geom_point(alpha=1/2) + 
-  scale_colour_gradientn(colours = terrain.colors(10))
+  geom_point(alpha=1/5) + 
+  scale_color_continuous(low='green', high='red')
 
 ```
 
@@ -395,11 +435,18 @@ nc$estimate <- predict(fit5)
 # Finally plot the measured values against the predict ones. Add a bissector
 # to get a better idea of how far off we are.
 ggplot(aes(x=estimate, y=nitrate), data=nc) + 
-  geom_point(alpha=1/3) + 
+  geom_point(alpha=1/5) + 
   geom_segment(aes(x = 0, y = 0, xend = 20, yend = 20), linetype="dashed",
                color="red")
 
 ```
+
+The last plot shows the measured values against the predicted values based on
+the lineair regression model (fit5). We did not include the last variable
+(catchcrop) in the equations since it did not result in further improvement of
+the model.
+This plot indicates that the model is capable of capturing some of the observed
+variance but that it is far from perfect.
 
 # Multivariate Analysis
 
@@ -413,9 +460,10 @@ plots.
 ### Did you create any models with your dataset? Discuss the \
 strengths and limitations of your model.
 
-We create a linear model based on the variables oxygen, area, emission, grass,
-total_veg & catchcrop. This last variable did not bring in additional
-information and is left out of the final model.
+We create a linear model based on the variables oxygen, area, emission, grass &
+total_veg This last variable did not bring in additional information and is left
+out of the final model.
+
 The R-square of the model is 0.409 which is not great.
 The plot with the comparison between measured and predcited concentrations also
 indicates that is capable of capturing some of the observed variance but that
@@ -456,7 +504,7 @@ ggplot(aes(x=nitrate, y=area*100), data=nc) +
 
 ### Description Two
 This plot indicates that there is a relation between the proportion of farmland
-in the upstream area and the nitratte concentrations measured in the river. 
+in the upstream area and the nitrate concentrations measured in the river. 
 This is an important conclusion as it indicates that human behaviour is (partly)
 responsible for the measured concentrations. Yet it also becomes clear from
 this plot that there are still other influencing factors.
@@ -466,7 +514,7 @@ this plot that there are still other influencing factors.
 ```{r echo=FALSE, Plot_Three}
 
 ggplot(aes(x=estimate, y=nitrate), data=nc) + 
-  geom_point(alpha=1/3) + 
+  geom_point(alpha=1/5) + 
   geom_segment(aes(x = 0, y = 0, xend = 20, yend = 20), linetype="dashed", 
                size=1.1, color="red") + 
   ggtitle('Measured versus predicted nitrate concentrations') + 
@@ -478,9 +526,16 @@ ggplot(aes(x=estimate, y=nitrate), data=nc) +
 ### Description Three
 This plot shows the comparison between measured and predicted nitrate
 concentrations. The predicted concentrations are based upon a linear model that
-includes all relevant ariables that were included in the analysis. This plot
-shows that we can explain some of the observed variance based on these variables
-but definetly not all.
+includes the variables:
+
+* oxygen
+* area
+* emission
+* grass
+* total vegetables
+
+This plot shows that we can explain some of the observed variance based on
+these variables but definetly not all.
 
 
 ------
@@ -502,9 +557,12 @@ of 0 values in the dataset. This is important to take into account in further
 investigations.
 
 The linear model we set up indicated that we can explain some of the observed
-variance based on the variables in our dataset but definetly not all.
+variance based on the variables in our dataset but definetly not all, which
+could be further investigated in future work.
 
 The dataset we used still contains a limited number of variables and does e.g. 
 not contain any information related to physical or chemical properties of the 
 soil such as e.g. soil texture which might influence nitrate concentrations as
-well. It might be worth repeating this analysis with those variables included.
+well. For future work it might be worth including such variables in the
+analysis.
+
