@@ -3,4 +3,5 @@
 data/
 scripts/
 datawrangling/
+tableau/
 *.pyc
